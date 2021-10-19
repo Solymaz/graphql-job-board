@@ -1,14 +1,23 @@
-import React, { Component } from 'react';
-import { JobList } from './JobList';
-const { jobs } = require('./fake-data');
+import React, { useEffect, useState } from "react";
+import { JobList } from "./JobList";
+import { loadJobs } from "./requests";
 
-export class JobBoard extends Component {
-  render() {
-    return (
-      <div>
-        <h1 className="title">Job Board</h1>
-        <JobList jobs={jobs} />
-      </div>
-    );
-  }
+//this function sends the graphql query as an http request
+export function JobBoard() {
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const jobs = await loadJobs();
+      setJobs(jobs);
+    }
+    fetchData();
+  }, [jobs]);
+
+  return (
+    <div>
+      <h1 className="title">Job Board</h1>
+      <JobList jobs={jobs} />
+    </div>
+  );
 }
