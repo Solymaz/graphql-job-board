@@ -12,7 +12,7 @@ export function JobBoard() {
       setJobs(jobs);
     }
     fetchData();
-  }, [jobs]);
+  }, []);
 
   return (
     <div>
