@@ -1,16 +1,25 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { jobs } from './fake-data';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { loadJob } from "./requests";
 
-export class JobDetail extends Component {
-  constructor(props) {
-    super(props);
-    const {jobId} = this.props.match.params;
-    this.state = {job: jobs.find((job) => job.id === jobId)};
-  }
+export function JobDetail({
+  match: {
+    params: { jobId },
+  },
+}) {
+  const [job, setJob] = useState();
 
-  render() {
-    const {job} = this.state;
+  useEffect(() => {
+    async function fetchData() {
+      const job = await loadJob(jobId);
+      setJob(job);
+    }
+    fetchData();
+  }, [job, jobId]);
+
+  if (!job) {
+    return null;
+  } else {
     return (
       <div>
         <h1 className="title">{job.title}</h1>
