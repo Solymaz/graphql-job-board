@@ -15,4 +15,11 @@ const Query = {
 const Job = {
   company: (job) => db.companies.get(job.companyId),
 };
-module.exports = { Query, Job };
+
+//one to many relationship between company and job
+const Company = {
+  jobs: (company) =>
+    db.jobs.list().filter((job) => job.companyId === company.id),
+};
+
+module.exports = { Query, Job, Company };
