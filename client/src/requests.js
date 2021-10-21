@@ -18,10 +18,10 @@ async function graphqlRequest(query, variables = {}) {
   const responseBody = await response.json();
   //in case of error, gql has an error property in the returned json obj
   //the error array's first property is an obj contaning error messages
-  const errorMessage = responseBody.errors
-    .map((error) => error.message)
-    .join("\n"); // --> map returns an array of error msgs.To have a string of masgs: we join them and separate them with a new line
   if (responseBody.errors) {
+    const errorMessage = responseBody.errors
+      .map((error) => error.message)
+      .join("\n"); // --> map returns an array of error msgs.To have a string of masgs: we join them and separate them with a new line
     throw new Error(errorMessage);
   }
   return responseBody.data;
