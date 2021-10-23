@@ -11,6 +11,12 @@ const Query = {
   jobs: () => db.jobs.list(),
   companies: () => db.companies.list(),
 };
+
+const Mutation = {
+  createJob: (root, { companyId, title, description }) => {
+    return db.jobs.create({ companyId, title, description });
+  },
+};
 //here we are returning the company whose id is the same as companyId of this job
 const Job = {
   company: (job) => db.companies.get(job.companyId),
@@ -22,4 +28,4 @@ const Company = {
     db.jobs.list().filter((job) => job.companyId === company.id),
 };
 
-module.exports = { Query, Job, Company };
+module.exports = { Query, Mutation, Job, Company };
