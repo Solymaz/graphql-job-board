@@ -1,6 +1,5 @@
 # schema -> resolver ->
 
-
 type Query {
   company(id: ID!): Company
   job(id: ID!): Job
@@ -8,9 +7,9 @@ type Query {
   companies: [Company]
 }
 
-#in gql operations that modify the data are called mutations. Mutations usually have arguments. 
+#in gql operations that modify the data are called mutations. Mutations usually have arguments.
 type Mutation {
-createJob(companyId: ID, title: String, description: String): ID
+  createJob(input: CreateJobInput): Job
 }
 
 type Company {
@@ -23,6 +22,12 @@ type Company {
 type Job {
   id: ID!
   company: Company
+  title: String
+  description: String
+}
+
+input CreateJobInput {
+  companyId: ID
   title: String
   description: String
 }

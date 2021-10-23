@@ -13,8 +13,9 @@ const Query = {
 };
 
 const Mutation = {
-  createJob: (root, { companyId, title, description }) => {
-    return db.jobs.create({ companyId, title, description });
+  createJob: (root, { input }) => {
+    const id = db.jobs.create(input);
+    return db.jobs.get(id);
   },
 };
 //here we are returning the company whose id is the same as companyId of this job
