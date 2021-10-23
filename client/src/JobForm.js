@@ -1,50 +1,58 @@
-import React, { Component } from 'react';
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { createJob } from "./requests";
 
-export class JobForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {title: '', description: ''};
-  }
+export function JobForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const history = useHistory();
 
-  handleChange(event) {
-    const {name, value} = event.target;
-    this.setState({[name]: value});
-  }
-
-  handleClick(event) {
+  function handleClick(event) {
     event.preventDefault();
-    console.log('should post a new job:', this.state);
+    const companyId = "HJRa-DOuG"; //FIXME
+    createJob({ companyId, title, description }).then((job) => {
+      history.push(`/jobs/${job.id}`);
+    });
   }
 
-  render() {
-    const {title, description} = this.state;
-    return (
-      <div>
-        <h1 className="title">New Job</h1>
-        <div className="box">
-          <form>
-            <div className="field">
-              <label className="label">Title</label>
-              <div className="control">
-                <input className="input" type="text" name="title" value={title}
-                  onChange={this.handleChange.bind(this)} />
-              </div>
+  return (
+    <div>
+      <h1 className="title">New Job</h1>
+      <div className="box">
+        <form>
+          <div className="field">
+            <label className="label">Title</label>
+            <div className="control">
+              <input
+                className="input"
+                type="text"
+                name="title"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+              />
             </div>
-            <div className="field">
-              <label className="label">Description</label>
-              <div className="control">
-                <textarea className="input" style={{height: '10em'}}
-                  name="description" value={description} onChange={this.handleChange.bind(this)} />
-              </div>
+          </div>
+          <div className="field">
+            <label className="label">Description</label>
+            <div className="control">
+              <textarea
+                className="input"
+                style={{ height: "10em" }}
+                name="description"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+              />
             </div>
-            <div className="field">
-              <div className="control">
-                <button className="button is-link" onClick={this.handleClick.bind(this)}>Submit</button>
-              </div>
+          </div>
+          <div className="field">
+            <div className="control">
+              <button className="button is-link" onClick={handleClick}>
+                Submit
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 }
