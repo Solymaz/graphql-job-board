@@ -1,9 +1,11 @@
+import { getAccessToken, isLoggedIn } from "./auth";
+
 const endpointURL = "http://localhost:9000/graphql";
 
 //a gql request always has a request but it doesn't always have variables
 //therefore we can make it optional by giving it a default value. we can set it to an empty obj
 async function graphqlRequest(query, variables = {}) {
-  const response = await fetch(endpointURL, {
+  const request = {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -14,7 +16,11 @@ async function graphqlRequest(query, variables = {}) {
       query,
       variables,
     }),
-  });
+  };
+  if (isLoggedIn()) {
+    request.headers["authorization"] = "Bearer " + getAccessToken();
+  }
+  const response = await fetch(endpointURL, request);
   const responseBody = await response.json();
   //in case of error, gql has an error property in the returned json obj
   //the error array's first property is an obj contaning error messages
