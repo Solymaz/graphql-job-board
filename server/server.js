@@ -34,9 +34,15 @@ we call it as a regular function using fs as below
 //encoding: "utf8" option is to make sure that it reads the file as a string and not a binary file
 const typeDefs = gql(fs.readFileSync("./schema.graphql", { encoding: "utf8" }));
 const resolvers = require("./resolvers");
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+//with the help of this function we can access the "user" property from the context in resolvers.js
+const context = ({ req }) => ({ user: req.user });
+const apolloServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context,
+});
 apolloServer.applyMiddleware({ app, path: "/graphql" });
-//the last 4 lines add GraphQL support. 
+//the last 4 lines add GraphQL support.
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;

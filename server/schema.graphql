@@ -1,4 +1,4 @@
-# schema -> resolver -> request -> corresponded client component 
+# schema -> resolver -> request -> corresponding client component 
 
 type Query {
   company(id: ID!): Company

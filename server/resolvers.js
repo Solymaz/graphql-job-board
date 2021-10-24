@@ -12,8 +12,13 @@ const Query = {
   companies: () => db.companies.list(),
 };
 
+//context argument can be used to access things that are not part of gql but are provided by the application
+//context can contain what we need to our gql resolvers
 const Mutation = {
-  createJob: (root, { input }) => {
+  createJob: (root, { input }, context) => {
+    if (!context.user) {
+      throw new Error("Unauthorized");
+    }
     const id = db.jobs.create(input);
     return db.jobs.get(id);
   },
