@@ -9,8 +9,7 @@ export function JobForm() {
 
   function handleClick(event) {
     event.preventDefault();
-    const companyId = "HJRa-DOuG"; //FIXME
-    createJob({ companyId, title, description }).then((job) => {
+    createJob({ title, description }).then((job) => {
       history.push(`/jobs/${job.id}`);
     });
   }

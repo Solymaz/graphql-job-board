@@ -35,7 +35,7 @@ we call it as a regular function using fs as below
 const typeDefs = gql(fs.readFileSync("./schema.graphql", { encoding: "utf8" }));
 const resolvers = require("./resolvers");
 //with the help of this function we can access the "user" property from the context in resolvers.js
-const context = ({ req }) => ({ user: req.user });
+const context = ({ req }) => ({ user: req.user && db.users.get(req.user.sub) });
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
