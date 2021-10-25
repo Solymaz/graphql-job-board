@@ -1,10 +1,35 @@
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from "apollo-boost";
+import gql from "graphql-tag";
 import { getAccessToken, isLoggedIn } from "./auth";
 
 const endpointURL = "http://localhost:9000/graphql";
 
+//apollolink takeas a function with 2 arguments: query or mutation to be executed and forwrad.
+const authLink = new ApolloLink((operation, forward) => {
+  if (isLoggedIn()) {
+    operation.setContext({
+      headers: {
+        authorization: "Bearer " + getAccessToken(),
+      },
+    });
+  }
+  return forward(operation);
+});
+
+//adding authlink before http link means it happens first and then the http request therefore we prepare the request before sending it
+const client = new ApolloClient({
+  link: ApolloLink.from([authLink, new HttpLink({ uri: endpointURL })]),
+  cache: new InMemoryCache(),
+});
+
 //a gql request always has a request but it doesn't always have variables
 //therefore we can make it optional by giving it a default value. we can set it to an empty obj
-async function graphqlRequest(query, variables = {}) {
+/*async function graphqlRequest(query, variables = {}) {
   const request = {
     method: "POST",
     headers: {
@@ -31,25 +56,31 @@ async function graphqlRequest(query, variables = {}) {
     throw new Error(errorMessage);
   }
   return responseBody.data;
-}
+}*/
 
 export async function createJob(input) {
-  const mutation = `mutation CreateJob ($input: CreateJobInput){
-    job: createJob (input: $input){
-      id
-      title
-      company{
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput) {
+      job: createJob(input: $input) {
         id
-        name
+        title
+        company {
+          id
+          name
+        }
       }
     }
-  }`;
-  const { job } = await graphqlRequest(mutation, { input });
+  `;
+  //const { job } = await graphqlRequest(mutation, { input });
+  const {
+    data: { job },
+  } = await client.mutate({ mutation, variables: { input } });
   return job;
 }
 export async function loadJob(id) {
-  const query = ` query JobQuery ($id : ID!){
-    job (id: $id){
+  const query = gql`
+    query JobQuery($id: ID!) {
+      job(id: $id) {
         id
         title
         company {
@@ -58,41 +89,58 @@ export async function loadJob(id) {
         }
         description
       }
-}`;
+    }
+  `;
   //const data = graphqlRequest(query, { id });
   //return data.job;
-  const { job } = await graphqlRequest(query, { id });
+  //const { job } = await graphqlRequest(query, { id });
+  const {
+    data: { job },
+  } = await client.query({ query, variables: { id } });
   return job;
 }
 
+//the gql tag function means that this template string will be processed by the gql function
+//gql function parses the given string into an obj that represents the gql query
 export async function loadJobs() {
-  const query = `
-  {
+  const query = gql`
+    {
       jobs {
+        id
+        title
+        company {
           id
-          title
-          company {
-            id
-            name
-          }
+          name
         }
-  }`;
-  const { jobs } = await graphqlRequest(query);
+      }
+    }
+  `;
+  //const { data } = await client.query({ query });
+  //return data.jobs;
+  const {
+    data: { jobs },
+  } = await client.query({ query });
   return jobs;
 }
 
 export async function loadCompany(id) {
-  const query = ` query CompanyQuery ($id : ID!){
-    company (id: $id){
-      id
-      name
-      description
-      jobs {
+  const query = gql`
+    query CompanyQuery($id: ID!) {
+      company(id: $id) {
         id
-        title
+        name
+        description
+        jobs {
+          id
+          title
+        }
       }
     }
-  }`;
-  const { company } = await graphqlRequest(query, { id });
+  `;
+  //const { company } = await graphqlRequest(query, { id });
+  // return company;
+  const {
+    data: { company },
+  } = await client.query({ query, variables: { id } });
   return company;
 }
